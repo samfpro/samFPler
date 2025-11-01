@@ -1,0 +1,206 @@
+// === FILE: samFPler.html (modified) ===
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SamFPler</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body onload="app.Start()">
+    <div class="container flex-column">
+        <div class="flex-row panel">
+            <div id="display-waveform-view" class="display relative flex-column">
+                <canvas id="waveform" class="absolute">waveform</canvas>
+                <div class="flex-row relative">
+                     <div id="display-current-selector">Part 1</div>
+                     <div id="display-current-option">pitch: 100</div>
+                 </div>
+                <div id="load-sample-button" class="button">load sample</div>
+         </div>
+            <div class="flex-column">
+                <div id="state-controls">
+                    <div id="save-button" class="button" aria-label="Save state"><img src="img/save_symbol.svg" height="25" width="25"></div>
+                    <div id="load-button" class="button" aria-label="Load state"><img src="img/load_symbol.svg" height="25" width="25"></div>
+                    <div id="export-button" class="button" aria-label="Export state"><img src="img/export_symbol.svg" height="25" width="25"></div>
+                    <div id="new-button" class="button" aria-label="Reset all"><img src="img/new_symbol.svg" height="25" width="25"></div>
+                </div>
+                <div id="options-knob" class="knob" aria-label="Adjust selected option"></div>
+            </div>
+        </div>
+        <div class="flex-row">
+        	         <div class="section-title">OPTIONS</div>
+          
+            <div id="options-grid" class="options-grid panel">
+         </div>
+            <div id="drawlevels-toggle" class="button"><img src="img/draw_symbol.svg" height="25" width = "25"></div>
+        </div>
+        <div class="flex-column panel">
+            <div id="part-section" class="selector-grid">
+                <div class="section-title">part</div>
+            </div>
+            <div id="pad-section" class="selector-grid">
+                <div class="section-title">pad</div>
+            </div>
+            <div id="step-section" class="selector-grid">
+                <div class="section-title">step</div>
+            </div>
+        </div>
+        <div id="sequencer" class="flex-column panel">
+            <div id="sequencer-background">
+                <div class="seq-bg-1"></div>
+                <div class="seq-bg-2"></div>
+                <div class="seq-bg-1"></div>
+                <div class="seq-bg-2"></div>
+            </div>
+            <div id="bar-row" class="bar-row controls">
+                <div id="transport-controls">
+                    <div id="play-button" class="button" aria-label="Play sequencer"><img src="img/play_symbol.svg" width="20" height="20"></div>
+                    <div id="pause-button" class="button" aria-label="Pause sequencer"><img src="img/pause_symbol.svg" width="20" height="20"></div>
+                    <div id="stop-button" class="button" aria-label="Stop sequencer"><img src="img/stop_symbol.svg" width="20" height="20"></div>
+                    <div id="record-button" class="button" aria-label="Live Record"><img src="img/record_symbol.svg" width="20" height="20"></div>
+                    <div id="metronome-toggle" class="button"><img src="img/metronome_symbol.svg"></div>
+                </div>
+                <div class="bar-label">curr bar:</div>
+                <div id="current-bar">1</div>
+                <div id="bar-down" class="button">-</div>
+                <div id="bar-up" class="button">+</div>
+                <div class="bar-label">total Bars:</div>
+                <div id="current-bars">1</div>
+                <div id="bars-down" class="button">-</div>
+                <div id="bars-up" class="button">+</div>
+                <div id="copy-bar" class="button"><img src="img/copy_symbol.svg"></div>
+                <div id="paste-bar" class="button"><img src="img/paste_symbol.svg"></div>
+                <div id="clipboard-indicator" class="round-light"></div>
+                            </div>
+            <div id="sequencer-grid" class="sequencer-grid">
+                <div class="section-title black">Sequencer</div>
+            </div>
+        </div>
+        <div id="samFPshift-panel" class="flex-column panel">
+            <div id="samFPshift-grid" class="samFPshift-grid">
+                <div class="section-title">samfpshift</div>
+            </div>
+            <div class="flex-row">
+                <div id="quick-select-grid" class="quick-select-grid"></div>
+                <div id="samFPshift-reset" class="button">reset</div>
+                <div id="samFPshift-knob" class="knob" aria-label="Adjust timing offset"></div>
+                <div class="flex-column">
+                    <div class="range">
+                        <div class="range-slider">
+                            <span class="range-selected"></span>
+                        </div>
+                        <div class="range-input">
+                            <input type="range" class="min" min="-49" max="49" value="-49" step="1">
+                            <input type="range" class="max" min="-49" max="49" value="49" step="1">
+                        </div>
+                    </div>
+                    <div id="range-center"></div>
+                    <div id="randomizer-button" class="button"><img src="img/dice.svg" width="25" height="25"></div>
+                </div>
+            </div>
+        </div>
+        <div id="bottom-row" class="flex-row panel">
+            <div id="scale-controls" class="controls flex-column">
+             <div>scale:</div> 
+  <div id="scale" class="scale-selector"></div>
+            </div>
+            <div id="bpm-controls" class="flex-column">
+                <div>bpm</div>
+                <div id="bpm" class="bpm-input"></div>
+            </div>
+    <div id="tap-bpm" class="button" aria-label="Tap BPM">Tap BPM</div>
+            <div id="fx-controls" class="flex-row">
+                   <div class="section-title">FX</div>
+    
+ <!-- New 3-way switch replaces selector and toggle -->
+   <div class="switch-container">
+ <div id="switch-track-1" class="switch-track">
+        <div id="switch-up" class="switch active"></div>
+        <div id="switch-label-up" class="switch-label active">revb</div>
+        <div id="switch-middle" class="switch"></div>
+        <div id="switch-label-middle" class="switch-label">dlay</div>
+        <div id="switch-down" class="switch"></div>
+        <div id="switch-label-down" class="switch-label">dist</div>
+    </div>
+    </div>
+
+    <!-- FX mixer always visible -->
+    <div id="fx-mixer" class="grid">
+        <div id="fx-dynamic-display-1" class="fx-dynamic-display"></div>
+        <div id="fx-dynamic-display-2" class="fx-dynamic-display"></div>
+        <div id="fx-dynamic-display-3" class="fx-dynamic-display"></div>
+
+        <div id="fx-knob-1" class="fx-knob"></div>
+        <div id="fx-knob-2" class="fx-knob"></div>
+        <div id="fx-knob-3" class="fx-knob"></div>
+    </div>
+</div>
+
+    <div id="sample-picker-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; color: white; padding: 20px; overflow-y: auto;">
+        <div style="background: #222; padding: 20px; border: 2px outset #666; max-width: 500px; margin: 50px auto; border-radius: 5px;">
+            <h3 style="margin-top: 0; color: white; text-align: center;">Load Sample</h3>
+            
+            <div style="margin-bottom: 15px; text-align: center;">
+                <div style="display: inline-block; margin: 0 10px;">
+                    <button id="change-folder-btn" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                        Select Folder
+                    </button>
+                </div>
+                <div style="display: inline-block; margin: 0 10px;">
+                    <button id="close-picker" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+            
+            <div id="sample-list" style="max-height: 300px; overflow-y: auto; background: #333; padding: 10px; border-radius: 4px;">
+                <p style="text-align: center; color: #888;">Use "Select Folder" to browse for audio files</p>
+            </div>
+            
+            <div style="margin-top: 15px; font-size: 12px; color: #aaa; text-align: center;">
+                Supported formats: WAV, MP3, OGG, FLAC, M4A
+            </div>
+        </div>
+    </div>
+    <!-- Add this line near the bottom of your body, before the scripts -->
+
+    <!-- DroidScript Native Bridge -->
+    <script src="ds:/Sys/app.js"></script>
+<script>
+        function OnStart() {
+            app.LoadScript("js/SampleManager.js");
+          
+            
+        }
+    </script>
+    <!-- External Libraries -->
+    <script src="js/jszip.min.js"></script>
+
+    <!-- Application Scripts -->
+    <script src="js/OptionsGrid.js"></script>
+    <script src="js/SelectorGrid.js"></script>
+    <script src="js/PartSelector.js"></script>
+    <script src="js/PartPreviewGrid.js"></script>
+    <script src="js/PadSelector.js"></script>
+    <script src="js/PadPreviewGrid.js"></script>
+    <script src="js/StepSelector.js"></script>
+    <script src="js/StepToggleButton.js"></script>
+    <script src="js/Sequencer.js"></script>
+    <script src="js/SamFPshift.js"></script>
+    <script src="js/Part.js"></script>
+    <script src="js/Pad.js"></script>
+    <script src="js/Step.js"></script>
+    <script src="js/Display.js"></script>
+    <script src="js/Knob.js"></script>
+    <script src="js/StateManager.js"></script>
+    <script src="js/AudioProcessor.js"></script>
+    <script src="js/SampleManager.js"></script>
+    <script src="js/WaveformRenderer.js"></script>
+    <script src="js/BarManager.js"></script>
+    <script src="js/ScaleManager.js"></script>
+    <script src="js/ParameterManager.js"></script>
+    <script src="js/FXManager.js"></script>    
+    <script src="js/SamFPler.js"></script>
+</body>
+</html>

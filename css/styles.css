@@ -1,0 +1,822 @@
+/*
+ * ========================================
+ * 1. GLOBAL STYLES & LAYOUT
+ * ========================================
+ */
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    font-variant-caps: all-small-caps;
+    background-color: black;
+    color: black;
+    margin: 0;
+}
+
+#fx-toggle {
+    height: 30px;
+    width: 20px;
+}
+
+.container {
+    padding: 3px;
+    background-color: black;
+    border: 3px outset blue;
+    
+}
+
+.round-light {
+    height: 10px;
+    width: 10px;
+    background-color: darkolivegreen;
+    border-radius: 50%;
+}
+
+
+/* Light on when effect is active */
+#fx-selector .round-light.active {
+    background-color: lime;
+    box-shadow: 0 0 6px lime;
+}
+
+/* Hide the mixer when FX panel is closed */
+#fx-mixer.hidden { display: none; }
+
+/* Small numeric read-out on the knob (optional) */
+.fx-knob::after {
+    content: attr(data-val);
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6px;
+    color: black;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+    width: 100%;
+}
+
+.absolute{
+	position: absolute;
+	}
+
+.relative{
+	position: relative;
+	}
+
+#fx-selector {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: 4fr 1fr;
+    text-align: right;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    align-content: center;
+}
+
+#range-label {
+    text-align: center;
+}
+
+.panel {
+    border: 2px outset black;
+    padding: 3px;
+    width: 100%;
+    background-color: ghostwhite;
+    align-content: space-evenly;
+    box-sizing: border-box;
+}
+
+/*
+ * ========================================
+ * 2. BUTTONS & GENERAL CONTROLS
+ * ========================================
+ */
+
+button,
+.button {
+    background-color: black;
+    color: white;
+    border: 2px outset white;
+    outline: 1.5px inset orange;
+    border-radius: 3px;
+    text-align: center;
+    padding: 2px;
+    cursor: pointer;
+    height: 20px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+button:hover {
+    background-color: #777;
+}
+
+#load-sample-button {
+    z-index: 100;
+    height: 20px;
+    width: 50px;
+    align-self: baseline;
+}
+
+#record-button.recording {
+    background-color: red;
+}
+
+#metronome-toggle.metronome-glow {
+    box-shadow: 0 0 20px lime;
+}
+
+
+.options-button:disabled {
+    cursor: not-allowed;
+}
+
+.options-button.differing {
+    background-color: darkslategray;
+    color: gold;
+}
+
+.options-button.selected-option {
+    background-color: darkorange;
+}
+
+.quick-select-button:hover {
+    background-color: #777;
+}
+.quick-select-button{
+height: 12px;
+}
+/*
+ * ========================================
+ * 3. DISPLAYS & INDICATORS
+ * ========================================
+ */
+
+.display {
+    border: 2px inset orange;
+    background-color: black;
+    width: 80%;
+    border-radius: 3px;
+}
+
+#display-waveform-view{
+    height:100px;
+	}
+
+#display-current-selector,
+#display-current-option {
+    color: whitesmoke;
+    background-color: transparent;
+}
+
+.bar-row {
+    display: flex;
+    justify-content: left;
+    gap: 2px;
+    margin-top: 2px;
+    z-index: 100;
+    color: black;
+    height: 20px;
+    align-items: center;
+}
+
+#current-bar,
+#current-bars {
+    width: 16px;
+    text-align: center;
+    background-color: black;
+    border: 2px inset orange;
+    color: white;
+    font-size: 16px;
+}
+
+#bar-up,
+#bar-down,
+#bars-up,
+#bars-down,
+#copy-bar,
+#paste-bar {
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+}
+
+#bars-up {
+    margin-right: 20px;
+}
+
+#clipboard-indicator {
+}
+
+#clipboard-indicator.active {
+    display: block;
+    background-color: lime;
+    box-shadow: 0 0 4px lime;
+}
+
+/*
+ * ========================================
+ * 4. SEQUENCER GRIDS & STEP TOGGLES
+ * ========================================
+ */
+
+#state-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.options-grid {
+    grid-area: options;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 20px);
+    height: 100px;
+}
+
+.quick-select-grid {
+    height: 44px;
+display: grid;
+    width: 60%;
+    grid-template-columns: repeat(4, 2fr);
+    grid-template-rows: repeat(2, 20px);
+}
+
+#samFPshift-reset {
+    height: 40px;
+    writing-mode: vertical-lr;
+    width: 20px;
+    text-orientation: upright;
+    letter-spacing: -0.35em;
+    background-color: crimson;
+}
+
+#samFPshift-panel{
+	height: 120px;
+	}
+
+#transport-controls {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 25px;
+}
+
+.controls {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+}
+
+.selector-grid {
+    display: grid;
+    gap: 3px;
+    width: 100%;
+}
+
+#part-section,
+#step-section {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    height: 40px;
+}
+
+#pad-section {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    height: 80px;
+}
+
+#step-section {
+    grid-area: steps;
+}
+
+.selector-button {
+    background-color: black;
+    border: 2px outset white;
+    outline: 1px inset black;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.selector-button::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--fill-height, 0%);
+    background: linear-gradient(to top, 
+        rgba(255, 255, 255, 0.6) 0%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        rgba(255, 255, 255, 0.2) 100%
+    ); /* Liquid shine: darker at bottom, fading up */
+    border-radius: 0 0 4px 4px; /* Rounded bottom for cup-like container */
+    transition: height 0.3s ease-out; /* Smooth pour animation */
+    pointer-events: none; /* Don't interfere with clicks */
+}
+
+.selector-button::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--fill-height, 0%);
+    background-color: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    z-index: 150;
+}
+
+#sequencer-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 4px;
+}
+
+.step-toggle-button {
+    background-color: rgba(230, 135, 128, 0.25);
+    border: 2px outset black;
+    outline: 1px inset orange;
+    border-radius: 3px;
+    height: 40px;
+    color: black;
+    z-index: 10;
+}
+
+.step-toggle-button.seq-toggle-state-on {
+    background-color: rgba(248, 239, 143, 1);
+    color: white;
+}
+
+.step-toggle-button.current-step {
+    background-color: #0f0;
+}
+
+.part-preview-grid,
+.pad-preview-grid {
+    display: grid;
+}
+
+.part-preview-grid {
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: 1fr 1fr;
+    row-gap: 3px;
+    height: 20px;
+}
+
+.pad-preview-grid {
+    grid-template-columns: repeat(16, 1fr);
+    grid-template-rows: 1fr;
+    row-gap: 3px;
+    height: 20px;
+    width: 100%;
+}
+
+.part-preview-cell,
+.pad-preview-cell {
+    background-color: #333;
+}
+
+.part-preview-cell.filled,
+.pad-preview-cell.filled {
+}
+
+/*
+ * ========================================
+ * 5. WAVEFORM & SAMPLE EDITING
+ * ========================================
+ */
+
+.waveform-view {
+    background-color: #333;
+    border-radius: 3px;
+}
+
+#waveform {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+}
+
+.samFPshift-grid {
+    display: grid;
+    height: 40px;
+    gap: 0px;
+    grid-template-columns: 0.5fr repeat(14, 1fr) 1.5fr;
+    outline: 1px solid black;
+    position: relative;
+}
+
+.samFPshift-cell {
+    background-color: midnightblue;
+    position: relative;
+}
+
+.samFPshift-cell.selected {
+    background-color: lightgray;
+}
+
+.samFPshift-cell.current-step {
+    background-color: #0f0;
+}
+
+.timing-line {
+    position: absolute;
+    top: -40%;
+    width: 2px;
+    height: 140%;
+    background-color: white;
+}
+
+.timing-line.dynamic {
+    background-color: white;
+    width: 2px;
+    height: 75%;
+    top: 2px;
+    border: 2px solid black;
+}
+
+/*
+ * ========================================
+ * 6. CUSTOM RANGE SLIDER (Knob/Fader)
+ * ========================================
+ */
+
+.range {
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    border: 2px inset black;
+    background-color: black;
+}
+
+.range-slider {
+    height: 4px;
+    position: relative;
+    background-color: #333;
+    border-radius: 2px;
+    width: 100%;
+}
+
+.range-selected {
+    height: 100%;
+    position: absolute;
+    border-radius: 2px;
+    background-color: darkorange;
+    left: 0%;
+}
+
+.range-input {
+    position: relative;
+    width: 100%;
+    height: 4px;
+}
+
+#randomizer-button {
+    height: 25px;
+    width: 25px;
+    align-self: center;
+    margin-top: -15px;
+}
+
+.range-input input {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    top: -6px;
+    background: none;
+    pointer-events: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+}
+
+.range-input input::-webkit-slider-thumb {
+    height: 24px;
+    width: 12px;
+    border-radius: 2px;
+    border: 4px outset orange;
+    background-color: white;
+    pointer-events: auto;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.range-input input::-moz-range-thumb {
+    height: 24px;
+    width: 12px;
+    border-radius: 2px;
+    border: 4px inset orange;
+    background-color: white;
+    pointer-events: auto;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+.range-input input::-webkit-slider-track {
+    -webkit-appearance: none;
+    height: 4px;
+    background: transparent;
+    border: 2px inset black;
+}
+
+.range-input input::-moz-range-track {
+    height: 4px;
+    background: transparent;
+}
+
+.knob {
+    min-width: 35px;
+    min-height: 35px;
+    background-color: orange;
+    border: 6px outset black;
+    border-radius: 50%;
+    cursor: grab;
+    align-self: center;
+}
+
+.knob:active {
+    cursor: grabbing;
+}
+
+/*
+ * ========================================
+ * 7. TEXT INPUTS & SELECTORS
+ * ========================================
+ */
+
+.bpm-input input {
+    width: 40px;
+    background-color: black;
+    color: white;
+    border-radius: 4px;
+    font-size: 16px;
+    border: 2px inset orange;
+    line-height: 16px;
+    height: 20px;
+}
+
+.scale-selector select {
+    padding: 5px;
+    background-color: #444;
+    color: #fff;
+    border: 2px solid #666;
+    border-radius: 4px;
+    font-size: 9px;
+}
+
+#bottom-row{
+	height: 60px;
+	}
+
+#sequencer-background {
+    position: absolute;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    z-index: 1;
+    height: 42px;
+    width: 99%;
+    margin-top: 32px;
+}
+
+.seq-bg-1 {
+    background-color: white;
+}
+
+.seq-bg-2 {
+    background-color: grey;
+}
+
+#sequencer {
+    z-index: 0;
+    position: relative;
+    height: 100px;
+}
+
+#range-center {
+    height: 20px;
+    width: 3px;
+    background-color: black;
+    align-self: center;
+    margin-top: -15px;
+}
+
+.section-title {
+    opacity: 50%;
+    color: white;
+    font-size: 45px;
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    align-self: center;
+    align-content: center;
+    z-index: 200;
+}
+
+.section-title.black {
+    color: black;
+    opacity: 25%;
+}
+
+@keyframes orange-glow {
+    0% { box-shadow: 0 0 0px orange; }
+    50% { box-shadow: 0 0 20px orange; }
+    100% { box-shadow: 0 0 0px orange; }
+}
+
+.pad-selector.triggered,
+.step-selector.triggered,
+.step-toggle-button.triggered {
+    animation: orange-glow 0.2s ease-in-out;
+}
+
+#fx-mixer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 4px;
+    align-items: center;
+    align-content: center;
+}
+
+.fx-dynamic-display {
+    background-color: black;
+    color: white;
+    border: 2px inset orange;
+    width: 40px;
+}
+
+.fx-knob {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background-color: orange;
+    border: 3px outset black;
+    align-self: center;
+}
+
+#fx-controls {
+    background-color: grey;
+    width: 100%;
+    height: 100%;
+}
+
+.bar-label {
+    text-align: right;
+}
+
+/* File: css/styles.css (relevant section) */
+#sample-picker-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#sample-picker-modal .sample-item {
+    border: 1px solid grey;
+    padding: 10px;
+    margin: 8px 0;
+    background: #333;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#sample-picker-modal .sample-item.playing {
+    background: #555;
+    border-color: lime;
+}
+
+#sample-picker-modal .sample-item span {
+    flex: 1;
+    font-size: 12px;
+    color: white;
+    cursor: pointer;
+}
+
+#sample-picker-modal button {
+    background: black;
+    color: white;
+    border: 2px outset white;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 12px;
+    text-align: center;
+}
+
+#sample-picker-modal button:hover {
+    background: #555;
+}
+
+#sample-picker-modal button.audition {
+    background: green;
+    width: 80px;
+}
+
+#sample-picker-modal button.audition:hover {
+    background: darkgreen;
+}
+
+#sample-picker-modal button.stop {
+    background: darkred;
+    width: 80px;
+}
+
+#sample-picker-modal button.stop:hover {
+    background: red;
+}
+
+#sample-picker-modal button.load {
+    background: orange;
+    width: 80px;
+}
+
+#sample-picker-modal button.load:hover {
+    background: darkorange;
+}
+
+#sample-picker-modal button#change-folder-btn {
+    background: blue;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#sample-picker-modal button#change-folder-btn:hover {
+    background: #0056b3;
+}
+
+#sample-picker-modal button#close-picker {
+    background: red;
+    width: 100px;
+}
+
+#sample-picker-modal button#close-picker:hover {
+    background: darkred;
+    }
+
+.switch {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+}
+
+.switch.active {
+  background-color: black;
+  border: 2px outset white;
+}
+.switch-container{
+	width: 50px;
+	margin-left: 10px;
+	}
+.switch-track {  
+  height: 35px;
+  width: 12px;
+  background-color: black;
+  outline-offset: 6px;
+  border-radius: 10px;
+  border: 2px inset orange;
+  display: grid;
+  grid-template-columns: 22px 44px;
+  grid-template-rows: 1fr 1fr 1fr;
+  font-size: 9px;
+  
+  .switch-label {
+    color: whitesmoke;
+    align-self: center;
+  }
+  
+  .switch-label.active {
+    color: yellow;
+  }
+}
+
+/* Ensure switch fits in FX controls flex-row */
+#fx-controls .switch-track {
+  margin-right: 10px; /* Space from mixer */
+  align-self: center;
+}

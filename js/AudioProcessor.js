@@ -300,39 +300,59 @@ class AudioProcessor {
         gainNode.connect(offlineMaster);
     }
 
-    audioBufferToWav(buffer) {
-        const numChannels = buffer.numberOfChannels;
-        const sampleRate = buffer.sampleRate;
-        const length = buffer.length * numChannels * 2 + 44;
-        const arrayBuffer = new ArrayBuffer(length);
-        const view = new DataView(arrayBuffer);
-        const writeString = (offset, string) => {
-            for (let i = 0; i < string.length; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i));
-            }
-        };
-        writeString(0, 'RIFF');
-        view.setUint32(4, 36 + buffer.length * numChannels * 2, true);
-        writeString(8, 'WAVE');
-        writeString(12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * numChannels * 2, true);
-        view.setUint16(32, numChannels * 2, true);
-        view.setUint16(34, 16, true);
-        writeString(36, 'data');
-        view.setUint32(40, buffer.length * numChannels * 2, true);
-        let offset = 44;
-        for (let i = 0; i < buffer.length; i++) {
-            for (let channel = 0; channel < numChannels; channel++) {
-                const sample = Math.max(-1, Math.min(1, buffer.getChannelData(channel)[i]));
-                view.setInt16(offset, sample * 0x7FFF, true);
-                offset += 2;
-            }
+    // Robust AudioBuffer to WAV encoder
+audioBufferToWav(buffer) {
+    const numChannels = buffer.numberOfChannels;
+    const sampleRate = buffer.sampleRate;
+    const numFrames = buffer.length;
+    const bytesPerSample = 2;
+    const blockAlign = numChannels * bytesPerSample;
+    const byteRate = sampleRate * blockAlign;
+    const dataSize = numFrames * blockAlign;
+    const bufferLength = 44 + dataSize; // header + data
+
+    const arrayBuffer = new ArrayBuffer(bufferLength);
+    const view = new DataView(arrayBuffer);
+
+    // Helper to write ASCII strings
+    function writeString(offset, s) {
+        for (let i = 0; i < s.length; i++) {
+            view.setUint8(offset + i, s.charCodeAt(i));
         }
-        return arrayBuffer;
     }
+
+    // RIFF header
+    writeString(0, 'RIFF');
+    view.setUint32(4, bufferLength - 8, true); // file size - 8
+    writeString(8, 'WAVE');
+
+    // fmt chunk
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true); // PCM chunk size
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, 16, true); // bits per sample
+
+    // data chunk
+    writeString(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    // Write interleaved PCM samples
+    let offset = 44;
+    for (let i = 0; i < numFrames; i++) {
+        for (let ch = 0; ch < numChannels; ch++) {
+            let sample = buffer.getChannelData(ch)[i];
+            // Clamp and scale
+            sample = Math.max(-1, Math.min(1, sample));
+            // Convert to 16-bit PCM (round for safety)
+            view.setInt16(offset, Math.round(sample * 32767), true);
+            offset += 2;
+        }
+    }
+    return arrayBuffer;
+}
 }
 // === END: js/AudioProcessor.js ===

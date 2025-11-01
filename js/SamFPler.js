@@ -1,4 +1,5 @@
-// === FILE: js/SamFPler.js (fixed export with length checks and warnings) ===
+// === FILE: js/SamFPler.js (14.3 KB) ===
+// === FILE: js/SamFPler.js (added loadFromPath method) ===
 function OnStart() {
     // Ensure app is the DroidScript global
     if (typeof app !== 'object') {
@@ -40,6 +41,11 @@ class SamFPler {
             this.scaleManager.setFallbackScales();
             this.init();
         });
+    }
+
+    // ADDED: Proxy method for loading samples
+    async loadFromPath(path) {
+        return await this.sampleManager.loadFromPath(path);
     }
 
     init() {
@@ -210,8 +216,6 @@ class SamFPler {
         this.fxManager.updateAll();
     }
 
-    // === FILE: js/SamFPler.js (13.2 KB) ===
-// ... (the rest of the class) ...
     async exportMixdown() {
     // Debug: Log sequence params
     const safeBpm = Math.max(30, Math.min(300, this.sequencer._bpm || 120));
@@ -233,9 +237,11 @@ class SamFPler {
     // Stereo master gain: Duplicate mono sources to both L/R for center pan
     const offlineMasterGainL = offlineCtx.createGain();
     const offlineMasterGainR = offlineCtx.createGain();
-    offlineMasterGainL.connect(offlineCtx.destination, 0, 0);  // L input to L output
-    offlineMasterGainR.connect(offlineCtx.destination, 0, 1);  // L input to R output (duplicate)
-    offlineMasterGainL.gain.value = 1.5;  // Boost for dry mix
+    const merger = offlineCtx.createChannelMerger(2);
+offlineMasterGainL.connect(merger, 0, 0);
+offlineMasterGainR.connect(merger, 0, 1);
+merger.connect(offlineCtx.destination);
+offlineMasterGainL.gain.value = 1.5;  // Boost for dry mix
     offlineMasterGainR.gain.value = 1.5;
 
     let triggered = 0;
@@ -274,13 +280,22 @@ class SamFPler {
     }
     console.log("Max amp in first ~1s: " + maxAmp);  // Should be >0.01 if audio present
 
-    const wavArrayBuffer = this.audioProcessor.audioBufferToWav(renderedBuffer);
-    const savePath = "/sdcard/samFPler/samFPler_mixdown.wav";
-    // Ensure dir exists
-    const dir = "/sdcard/samFPler/";
-    if (!app.FileExists(dir)) app.MakeFolder(dir);
-    app.WriteFile(savePath, new Uint8Array(wavArrayBuffer));
-    if (app.FileExists(savePath)) {
+const wavArrayBuffer = this.audioProcessor.audioBufferToWav(renderedBuffer);
+const savePath = "/sdcard/samFPler/samFPler_mixdown.wav";
+// Ensure dir exists
+const dir = "/sdcard/samFPler/";
+if (!app.FileExists(dir)) app.MakeFolder(dir);
+
+// Convert binary to Base64 for DroidScript binary write
+const uint8Array = new Uint8Array(wavArrayBuffer);
+let binaryString = '';
+for (let i = 0; i < uint8Array.byteLength; i++) {
+    binaryString += String.fromCharCode(uint8Array[i]);
+}
+const base64Data = btoa(binaryString);
+
+app.WriteFile(savePath, base64Data, "Base64");
+if (app.FileExists(savePath)) {
         const fileSize = app.GetFileSize(savePath);
         app.Alert(`Stereo mixdown saved to ${savePath} (${fileSize} bytes)`);
         console.log("Export complete: File size=" + fileSize);
@@ -293,7 +308,7 @@ class SamFPler {
 
     resetAll() {
         this._parts.forEach(part => part.resetParams());
-        this.sampleManager._sampleCache.clear();
+        this.sampleManager.clearCache(); // FIXED: Call clearCache
         this._activeSources = [];
         this.barManager.clipboard = null;
         this.barManager.updateClipboardIndicator();

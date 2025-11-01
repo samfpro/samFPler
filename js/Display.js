@@ -1,3 +1,4 @@
+// === FILE: js/Display.js (updated loadSample listener) ===
 class Display {
     constructor(samFPler) {
         this.app = samFPler;
@@ -7,8 +8,8 @@ class Display {
     }
 
     init() {
-        this.loadSampleButton.addEventListener('click', ()=> this.app.sampleManager.showSamplePicker());
-}
+        this.loadSampleButton.addEventListener('click', () => this.app.sampleManager.loadSample());  // FIXED: Use loadSample() for permission check
+    }
 
     update() {
         let text = `Part ${this.app._currentPart._index + 1}`;
@@ -25,3 +26,4 @@ class Display {
         this.optionDisplay.textContent = `${this.app._currentOption}: ${value}`;
     }
 }
+// === END: js/Display.js ===

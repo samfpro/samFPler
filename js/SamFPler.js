@@ -29,6 +29,7 @@ class SamFPler {
         this.parameterManager = new ParameterManager(this);
         this.optionsGrid = new OptionsGrid(this);
         this.selectorGrid = new SelectorGrid(this);
+        this.overviewGrid = new OverviewGrid(this);
         this.sequencer = new Sequencer(this);
         this.samFPshift = new SamFPshift(this);
         this.display = new Display(this);
@@ -56,6 +57,7 @@ class SamFPler {
         this.initBpmInput();
         this.optionsGrid.init();
         this.selectorGrid.init();
+        this.overviewGrid.init();
         this.sequencer.init();
         this.samFPshift.init();
         this.display.init();

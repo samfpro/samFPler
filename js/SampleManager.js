@@ -45,50 +45,50 @@ class SampleManager {
         }
     }
 
-    checkStoragePermission(onGranted) {
-        console.log("Checking storage permission...");
-        const storageUri = app.CheckPermission("extsdcard");
-        if (storageUri) {
-            console.log("Storage permission already granted, URI:", storageUri);
-            this._currentFolderUri = storageUri;
-            this._displayPath = this.extractDisplayPath(storageUri);
-            if (onGranted) onGranted();
-        } else {
-            console.log("No permission yet, requesting on demand");
-            this.requestNewFolderPermission();
-            if (onGranted) onGranted(); // Call for consistency
-        }
-    }
-
-    requestNewFolderPermission() {
-        console.log("Requesting permission for new folder...");
+    async requestPermissionAsync() {
+    return new Promise((resolve) => {
         app.GetPermission("extsdcard", (uri) => {
             if (uri) {
                 console.log("Permission granted, URI:", uri);
                 this._currentFolderUri = uri;
                 this._displayPath = this.extractDisplayPath(uri);
-                this._lastFolderFiles = this.getFilesInFolder(this._currentFolderUri);
-                this.showSamplePicker();
+                resolve({ granted: true, uri });
             } else {
                 console.error("Permission denied");
-                app.Alert("Permission denied. Using default path or select a file.");
-                this.fallbackToChooseFile();
+                resolve({ granted: false, uri: null });
             }
         });
-    }
+    });
+}
 
-    manualPathInput() {
-        console.log("Prompting for manual path input");
-        app.ShowTextDialog("Enter folder path (e.g., /storage/emulated/0/Music/):", this._displayPath, (path) => {
-            if (path) {
-                // Note: Manual path ignored for ops; re-prompt permission for real URI
-                this.requestNewFolderPermission();
-            } else {
-                app.Alert("No path entered, using default or select a file.");
-                this.fallbackToChooseFile();
-            }
-        });
+// UPDATED: checkStoragePermission – now async, no premature callback
+async checkStoragePermission() {
+    console.log("Checking storage permission...");
+    const storageUri = app.CheckPermission("extsdcard");
+    if (storageUri) {
+        console.log("Storage permission already granted, URI:", storageUri);
+        this._currentFolderUri = storageUri;
+        this._displayPath = this.extractDisplayPath(storageUri);
+        return { granted: true, uri: storageUri };
+    } else {
+        console.log("No permission yet, requesting...");
+        return await this.requestPermissionAsync();  // Await here – no immediate onGranted
     }
+}
+
+    async requestNewFolderPermission() {
+    console.log("Requesting permission for new folder...");
+    const result = await this.requestPermissionAsync();
+    if (result.granted) {
+        this._lastFolderFiles = this.getFilesInFolder(result.uri);
+        this.showSamplePicker();
+    } else {
+        app.Alert("Permission denied. Using fallback file selection.");
+        this.fallbackToChooseFile();
+    }
+}
+
+    
 
     fallbackToChooseFile() {
         console.log("Falling back to app.ChooseFile for audio selection");
@@ -161,26 +161,34 @@ class SampleManager {
         }
     }
 
-    loadSample() {
-        if (!(this.app._currentSelector instanceof Part)) {
-            app.Alert("Select a Part to load sample.");
-            return;
-        }
-        if (this._sampleCache.size >= this._maxSamples) {
-            app.Alert(`Max samples (${this._maxSamples}) reached. Clear cache or load fewer unique samples.`);
-            return;
-        }
-        this.checkStoragePermission(() => {
-            const files = this.getFilesInFolder(this._currentFolderUri);
-            if (files.length === 0) {
-                app.Alert("No audio files found. Select a folder or file manually.");
-                this.requestNewFolderPermission();
-            } else {
-                this._lastFolderFiles = files;
-                this.showSamplePicker();
-            }
-        });
+    async loadSample() {
+    if (!(this.app._currentSelector instanceof Part)) {
+        app.Alert("Select a Part to load sample.");
+        return;
     }
+    if (this._sampleCache.size >= this._maxSamples) {
+        app.Alert(`Max samples (${this._maxSamples}) reached. Clear cache or load fewer unique samples.`);
+        return;
+    }
+
+    const permResult = await this.checkStoragePermission();  // Await resolution
+    if (!permResult.granted) {
+        app.Alert("Permission denied. Using fallback file selection.");
+        this.fallbackToChooseFile();
+        return;
+    }
+
+    // Now safe to proceed – URI is set
+    const files = this.getFilesInFolder(this._currentFolderUri);
+    if (files.length === 0) {
+        app.Alert("No audio files found. Select a folder or file manually.");
+        this.requestNewFolderPermission();  // Re-prompt only if needed
+    } else {
+        this._lastFolderFiles = files;
+        this.showSamplePicker();
+    }
+}
+
 
     // FIXED: getFilesInFolder uses URI directly
     getFilesInFolder(folderUri) {
@@ -263,25 +271,42 @@ class SampleManager {
 
             const auditionBtn = document.createElement("button");
             auditionBtn.classList.add("audition");
-            auditionBtn.textContent = "Audition";
             auditionBtn.addEventListener("click", () => this.auditionSample(file));
             item.appendChild(auditionBtn);
-
+const playIcon =document.createElement("img");
+playIcon.src = 'img/play_symbol.svg';
+playIcon.alt = 'Play symbol'; // For accessibility
+playIcon.style.width = '20px'; // Optional: Size the icon
+playIcon.style.height = '20px';
+playIcon.style.marginRight = '5px'; // Optional: Spacing from text
+auditionBtn.appendChild(playIcon);
             const stopBtn = document.createElement("button");
             stopBtn.classList.add("stop");
-            stopBtn.textContent = "Stop";
             stopBtn.addEventListener("click", () => this.stopAudition());
             item.appendChild(stopBtn);
-
+const stopIcon =document.createElement("img");
+stopIcon.src = 'img/stop_symbol.svg';
+stopIcon.alt = 'Stop symbol'; // For accessibility
+stopIcon.style.width = '20px'; // Optional: Size the icon
+stopIcon.style.height = '20px';
+stopIcon.style.marginRight = '5px'; // Optional: Spacing from text
+stopBtn.appendChild(stopIcon);
+   
             const loadBtn = document.createElement("button");
             loadBtn.classList.add("load");
-            loadBtn.textContent = "Load";
             loadBtn.addEventListener("click", async () => {
                 await this.loadFromUri(file.uri);
                 modal.style.display = "none";
             });
             item.appendChild(loadBtn);
-
+const loadIcon = document.createElement("img");
+loadIcon.src = 'img/load_symbol.svg';
+loadIcon.alt = 'Load symbol'; // For accessibility
+loadIcon.style.width = '20px'; // Optional: Size the icon
+loadIcon.style.height = '20px';
+loadIcon.style.marginRight = '5px'; // Optional: Spacing from text
+loadBtn.appendChild(loadIcon);
+   
             sampleList.appendChild(item);
         });
         modal.style.display = "block";

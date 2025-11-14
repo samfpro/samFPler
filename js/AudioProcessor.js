@@ -37,11 +37,11 @@ class AudioProcessor {
         this.masterComp = this._audioContext.createDynamicsCompressor();
         this.masterComp.threshold.value = -24;
         this.masterComp.knee.value = 30;
-        this.masterComp.ratio.value = 12;
+        this.masterComp.ratio.value = 2.5;
         this.masterComp.attack.value = 0.003;
         this.masterComp.release.value = 0.25;
         this.masterLim = this._audioContext.createDynamicsCompressor();
-        this.masterLim.threshold.value = -6;
+        this.masterLim.threshold.value = -4;
         this.masterLim.knee.value = 0;
         this.masterLim.ratio.value = 20;
         this.masterLim.attack.value = 0.003;

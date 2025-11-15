@@ -5,25 +5,12 @@
 class OverviewGrid {
     constructor(samFPler) {
         this.app = samFPler;
-        this.container = null;
+        this.grid = null;
         this.cells = []; // 16x16 grid of cell elements
     }
 
     init() {
-        this.container = document.getElementById('overview-grid');
-        // Clear existing content except title
-        this.container.innerHTML = '<div class="section-title">overview</div>';
-
-        // Create 16x16 grid: rows = parts (0-15), cols = steps (0-15)
-        const grid = document.createElement('div');
-        grid.classList.add('overview-grid-cells');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(16, 1fr)';
-        grid.style.gridTemplateRows = 'repeat(16, 1fr)';
-        grid.style.gap = '1px';
-        grid.style.backgroundColor = 'black';
-        grid.style.padding = '2px';
-        this.container.appendChild(grid);
+        this.grid = document.getElementById('overview-grid');
 
         for (let row = 0; row < 16; row++) { // row = part index (0=Part1, top)
             this.cells[row] = [];
@@ -34,7 +21,7 @@ class OverviewGrid {
                 cell.dataset.step = col;
                 cell.style.backgroundColor = 'black'; // Default empty
                 cell.style.border = 'none'; // No borders
-                grid.appendChild(cell);
+                this.grid.appendChild(cell);
                 this.cells[row][col] = cell;
             }
         }

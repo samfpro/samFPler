@@ -103,6 +103,7 @@ class StateManager {
         this.app.sequencer.update();
         this.app.waveformRenderer.updateWaveformView();  // FIXED: Use waveformRenderer
         this.app.selectorGrid.updateAllPreviewsAndGlows();
+        this.app.overviewGrid.update();
     }
 
     async loadSampleKey(key) {

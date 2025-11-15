@@ -1,3 +1,4 @@
+// === FILE: js/SelectorGrid.js (modified) ===
 // === FILE: js/SelectorGrid.js (1.9 KB) ===
 class SelectorGrid {
     constructor(samFPler) {
@@ -51,6 +52,43 @@ class SelectorGrid {
         this.padUIs.forEach(ui => ui.updateGlow());
         this.stepUIs.forEach(ui => ui.updateGlow());
     }
+
+    // NEW: Update throbbing for current selector and its parents
+    // NEW: Update throbbing for current selector and its parents
+updateThrobbing() {
+    // Clear all overlays (removes throbbing visuals)
+    [...document.querySelectorAll('.throb-overlay')].forEach(overlay => overlay.remove());
+
+    // Traverse up the hierarchy from current selector and add throbbing overlay
+    let current = this.app._currentSelector;
+    while (current) {
+        let ui = null;
+        if (current instanceof Part) {
+            ui = this.partUIs.find(u => u.data === current);
+        } else if (current instanceof Pad) {
+            ui = this.padUIs.find(u => u.data === current);
+        } else if (current instanceof Step) {
+            const localIndex = current._index % 16;
+            ui = this.stepUIs[localIndex];
+        }
+
+        if (ui && ui.element && !ui.element.querySelector('.throb-overlay')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'throb-overlay';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'white';
+            overlay.style.zIndex = '200';
+            overlay.style.pointerEvents = 'none';
+            ui.element.appendChild(overlay);
+        }
+
+        current = current?._parent;
+    }
+}
 
     // NEW: Update fills across all selectors for the current option
     updateFills(option) {

@@ -213,6 +213,7 @@ class SamFPler {
         this.display.update();
         this.selectorGrid.updateFills(this._currentOption); // NEW: Update liquid fills
         this.selectorGrid.updateGlows();
+        this.selectorGrid.updateThrobbing(); // NEW: Update throbbing for hierarchy
         this.sequencer.update();
         this.waveformRenderer.updateWaveformView();
         this.fxManager.updateAll();
@@ -315,6 +316,7 @@ if (app.FileExists(savePath)) {
         this.barManager.clipboard = null;
         this.barManager.updateClipboardIndicator();
         this.updateSelection();
+        this.overviewGrid.update();
     }
 
     getRepeatCount(repeat) {

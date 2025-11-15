@@ -61,21 +61,23 @@ class Sequencer {
     }
 
     toggleStep(localIndex) {
-        const offset = this.app.barManager._currentBar * 16;
-        const globalIndex = offset + localIndex;
-        const step = this.app._currentPad._steps[globalIndex];
-        if (!step) return;
-        step._on = !step._on;
-        // Add feedback for toggle
-        this.stepToggleButtons[localIndex].element.classList.add('triggered');
-        setTimeout(() => this.stepToggleButtons[localIndex].element.classList.remove('triggered'), 150);
-        this.update();
-        this.app.selectorGrid.updateStepUIs();
-        this.app.selectorGrid.updatePadPreviews();
-        const partUI = this.app.selectorGrid.partUIs.find(ui => ui.data === this.app._currentPart);
-        if (partUI) partUI.partPreviewGrid.update();
-        this.app.selectorGrid.updateGlows();
-    }
+    const offset = this.app.barManager._currentBar * 16;
+    const globalIndex = offset + localIndex;
+    const step = this.app._currentPad._steps[globalIndex];
+    if (!step) return;
+    step._on = !step._on;
+    // Add feedback for toggle
+    this.stepToggleButtons[localIndex].element.classList.add('triggered');
+    setTimeout(() => this.stepToggleButtons[localIndex].element.classList.remove('triggered'), 150);
+    this.update();
+    this.app.selectorGrid.updateStepUIs();
+    this.app.selectorGrid.updatePadPreviews();
+    const partUI = this.app.selectorGrid.partUIs.find(ui => ui.data === this.app._currentPart);
+    if (partUI) partUI.partPreviewGrid.update();
+    this.app.selectorGrid.updateGlows();
+    this.app.selectorGrid.updateThrobbing();
+    this.app.overviewGrid.update(); // NEW: Refresh overview
+}
 
     getCurrentLocalStep() {
         const elapsed = this._audioContext.currentTime - this._startTime;
@@ -258,6 +260,10 @@ class Sequencer {
     this.app.samFPshift.cells.forEach((cell, i) => cell.classList.toggle('current-step', i === localStep));
 
     requestAnimationFrame(() => this.animationLoop());
+}
+updateForBarChange() {
+    this.update(); // Refresh toggles for new bar
+    this.app.overviewGrid.update(); // NEW: Refresh overview for new bar
 }
 }
 // === END: js/Sequencer.js ===

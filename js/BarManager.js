@@ -41,6 +41,8 @@ class BarManager {
 
     updateCurrentBarDisplay() {
         document.getElementById('current-bar').textContent = this._currentBar + 1;
+       this.app.overviewGrid.update(); // NEW: Refresh for current bar
+ 
     }
 
     updateBarsDisplay() {
@@ -77,6 +79,7 @@ class BarManager {
         this.app.sequencer.update();
         this.app.display.update();
         this.updateBarsDisplay();
+        this.app.overviewGrid.update();
     }
 
     copyCurrentBar() {
@@ -116,6 +119,7 @@ class BarManager {
         this.app.selectorGrid.updateGlows();
         this.app.sequencer.update();
         this.app.display.update();
+        this.app.overviewGrid.update();
     }
 
     updateClipboardIndicator() {
